@@ -84,6 +84,7 @@ export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfil
 
   useEffect(() => {
     requestLocation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
   }, []);
 
   const handleStartSession = useCallback(() => {
