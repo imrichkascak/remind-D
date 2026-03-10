@@ -25,9 +25,12 @@ export function DesktopSidebar({ view, setView, profile, location, currentTime }
       <nav className="flex-1 px-3">
         {NAV_ITEMS.map((item) => (
           <button
+            type="button"
             key={item.key}
             onClick={() => setView(item.key)}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-1 transition-all text-left"
+            aria-current={view === item.key ? "page" : undefined}
+            aria-label={item.label}
             style={{
               background: view === item.key ? "rgba(245,166,35,0.12)" : "transparent",
               border: "none",

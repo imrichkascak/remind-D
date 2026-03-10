@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import type { UserProfile, SunSession } from "@/types";
 import { getSolarData } from "@/lib/vitaminD";
 import { saveSessions, loadSessions } from "@/lib/storage";
+import { pushSync } from "@/lib/sync";
+import { useAuth } from "@/contexts/AuthContext";
 import { DesktopSidebar } from "./DesktopSidebar";
 import { MobileNav } from "./MobileNav";
 import { DashboardView } from "./DashboardView";
@@ -25,6 +27,7 @@ const VIEW_TITLES: Record<View, string> = {
 };
 
 export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfile; onResetProfile: () => void }) {
+  const { user } = useAuth();
   const [location, setLocation] = useState<{ lat: number; lng: number; city: string } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [solarData, setSolarData] = useState<ReturnType<typeof getSolarData> | null>(null);
@@ -101,10 +104,11 @@ export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfil
     setSessions((prev) => {
       const updated = [completed, ...prev];
       saveSessions(updated);
+      if (user) void pushSync(profile, updated);
       return updated;
     });
     setActiveSession(null);
-  }, []);
+  }, [user, profile]);
 
   const today = new Date().toDateString();
   const todaySessions = sessions.filter((s) => new Date(s.startTime).toDateString() === today);

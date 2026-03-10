@@ -12,9 +12,11 @@ function StartSessionButton({ solarData, onClick, className }: {
   const enabled = solarData.uvIndex >= 0.5;
   return (
     <button
+      type="button"
       onClick={onClick}
       disabled={!enabled}
       className={`w-full py-4 rounded-2xl font-medium text-lg transition-all ${className ?? ""}`}
+      aria-label={enabled ? "Start sun session" : "No UV right now"}
       style={{
         background: enabled ? "linear-gradient(135deg, #F5A623, #E07B00)" : "rgba(255,255,255,0.06)",
         color: enabled ? "#000" : "var(--text-muted)",
@@ -146,7 +148,7 @@ export function DashboardView({
           {locationError && (
             <div>
               <p className="text-sm mb-2" style={{ color: "#f87171" }}>{locationError}</p>
-              <button onClick={onRequestLocation} className="text-sm underline" style={{ color: "var(--sun)" }}>Try again</button>
+              <button type="button" onClick={onRequestLocation} className="text-sm underline" style={{ color: "var(--sun)" }} aria-label="Try again to get location">Try again</button>
             </div>
           )}
 

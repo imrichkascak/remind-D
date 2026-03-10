@@ -21,6 +21,15 @@
 
 * { box-sizing: border-box; }
 
+/* Accessibility: keyboard focus visible with light outline (only when focusing via Tab, not mouse) */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--sun-bright);
+  outline-offset: 2px;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -133,6 +142,21 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: var(--sun);
   cursor: pointer;
+  box-shadow: 0 0 8px rgba(245,166,35,0.5);
+}
+input[type="range"]:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px var(--sky), 0 0 0 5px var(--sun-bright), 0 0 8px rgba(245,166,35,0.5);
+}
+input[type="range"]:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px var(--sky), 0 0 0 5px var(--sun-bright), 0 0 8px rgba(245,166,35,0.5);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sun);
+  cursor: pointer;
+  border: none;
   box-shadow: 0 0 8px rgba(245,166,35,0.5);
 }
 

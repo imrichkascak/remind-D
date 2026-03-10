@@ -1,5 +1,6 @@
 import type { UserProfile, SunSession } from "@/types";
 import { SKIN_TYPES } from "@/lib/vitaminD";
+import { AuthSection } from "./AuthSection";
 
 export function SettingsView({ profile, sessions, onResetProfile }: {
   profile: UserProfile;
@@ -35,6 +36,9 @@ export function SettingsView({ profile, sessions, onResetProfile }: {
       <h2 className="font-display text-xl mb-4 md:hidden" style={{ color: "var(--text)" }}>Profile</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 max-w-4xl w-full">
+        <div className="md:col-span-2">
+          <AuthSection />
+        </div>
         <div className="glass rounded-2xl p-5 lg:p-6">
           <h3 className="text-sm font-medium mb-4" style={{ color: "var(--text-muted)", letterSpacing: "0.05em", textTransform: "uppercase" }}>Your profile</h3>
           <div className="flex flex-col gap-3">
@@ -65,9 +69,11 @@ export function SettingsView({ profile, sessions, onResetProfile }: {
           </div>
 
           <button
+            type="button"
             onClick={onResetProfile}
             className="w-full py-3 rounded-xl text-sm transition-all"
             style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171", cursor: "pointer" }}
+            aria-label="Reset profile and all data"
           >
             Reset profile & data
           </button>

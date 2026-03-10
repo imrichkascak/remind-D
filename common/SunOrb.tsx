@@ -19,7 +19,18 @@ export function SunOrb({ altitude, isActive }: { altitude: number; isActive: boo
           background: `radial-gradient(circle, #FFE566 0%, #F5A623 45%, #E07B00 75%, transparent 100%)`,
         }}
       />
-      <div className="absolute" style={{ width: size * 1.6, height: size * 1.6, opacity: opacity * 0.4, animation: isActive ? "rays-spin 20s linear infinite" : "none" }}>
+      <div
+        className="absolute"
+        style={{
+          width: size * 1.6,
+          height: size * 1.6,
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, calc(-17% + 6px))",
+          opacity: opacity * 0.4,
+          animation: isActive ? "rays-spin 20s linear infinite" : "none",
+        }}
+      >
         {Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className="absolute" style={{
             width: 2,

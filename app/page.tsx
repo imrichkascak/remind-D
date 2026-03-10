@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import type { UserProfile } from "@/types";
-import { saveProfile, loadProfile } from "@/lib/storage";
+import { saveProfile, loadProfile, saveSessions, loadSessions, loadSessionLocations } from "@/lib/storage";
+import { pullSync, pushSync, mergeProfile, mergeSessions } from "@/lib/sync";
+import { useAuth } from "@/contexts/AuthContext";
 import { SunOrb } from "@/common";
 import { SetupScreen } from "@/components/SetupScreen";
 import { TrackerScreen } from "@/components/TrackerScreen";
@@ -10,15 +12,36 @@ import { TrackerScreen } from "@/components/TrackerScreen";
 export default function HomePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    setProfile(loadProfile());
-    setLoaded(true);
-  }, []);
+    if (authLoading) return;
+    const local = loadProfile();
+    if (user) {
+      pullSync().then(async ({ profile: syncedProfile, sessions: syncedSessions, error }) => {
+        const mergedProfile = mergeProfile(syncedProfile, local?.name ?? "");
+        const locations = loadSessionLocations();
+        const mergedSessions = mergeSessions(syncedSessions, locations);
+        if (mergedProfile) {
+          saveProfile(mergedProfile);
+          setProfile(mergedProfile);
+        } else if (local) {
+          setProfile(local);
+        }
+        saveSessions(mergedSessions);
+        setLoaded(true);
+        if (!syncedProfile && local) await pushSync(local, mergedSessions);
+      });
+    } else {
+      setProfile(local);
+      setLoaded(true);
+    }
+  }, [authLoading, user]);
 
-  const handleComplete = (p: UserProfile) => {
+  const handleComplete = async (p: UserProfile) => {
     saveProfile(p);
     setProfile(p);
+    if (user) await pushSync(p, loadSessions());
   };
 
   const handleReset = () => {

@@ -46,9 +46,11 @@ export function SessionTimer({
           </span>
         </div>
         <button
+          type="button"
           onClick={() => onStop({ ...session, endTime: Date.now(), vitaminD })}
           className="px-4 py-2 rounded-xl text-sm font-medium transition-all"
           style={{ background: "rgba(255,255,255,0.08)", border: "1px solid var(--border)", color: "var(--text)" }}
+          aria-label="Stop session"
         >
           Stop ◼
         </button>

@@ -13,9 +13,12 @@ export function MobileNav({ view, setView }: { view: View; setView: (v: View) =>
       <div className="glass rounded-2xl flex w-full max-w-md">
         {NAV_ITEMS.map((item) => (
           <button
+            type="button"
             key={item.key}
             onClick={() => setView(item.key)}
             className="flex-1 py-3 flex flex-col items-center gap-1 transition-all rounded-2xl"
+            aria-current={view === item.key ? "page" : undefined}
+            aria-label={item.label}
             style={{
               background: view === item.key ? "rgba(245,166,35,0.12)" : "transparent",
               border: "none",

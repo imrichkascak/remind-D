@@ -32,8 +32,8 @@ export function SetupScreen({ onComplete }: { onComplete: (p: UserProfile) => vo
               border: "1px solid var(--border)",
               borderRadius: 12,
               color: "var(--text)",
-              outline: "none",
             }}
+            aria-label="Your name"
             autoFocus
           />
         </div>
@@ -46,9 +46,12 @@ export function SetupScreen({ onComplete }: { onComplete: (p: UserProfile) => vo
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
           {SKIN_TYPES.map((st) => (
             <button
+              type="button"
               key={st.type}
               onClick={() => setProfile((p) => ({ ...p, skinType: st.type }))}
               className="flex flex-col items-center gap-2 p-3 rounded-xl transition-all"
+              aria-pressed={profile.skinType === st.type}
+              aria-label={st.label}
               style={{
                 background: profile.skinType === st.type ? "rgba(245,166,35,0.15)" : "rgba(255,255,255,0.04)",
                 border: `1px solid ${profile.skinType === st.type ? "var(--sun)" : "var(--border)"}`,
@@ -69,9 +72,12 @@ export function SetupScreen({ onComplete }: { onComplete: (p: UserProfile) => vo
         <div className="flex flex-col gap-2">
           {BODY_EXPOSURE_OPTIONS.map((opt) => (
             <button
+              type="button"
               key={opt.value}
               onClick={() => setProfile((p) => ({ ...p, bodyExposure: opt.value }))}
               className="flex items-center gap-4 p-4 rounded-xl transition-all"
+              aria-pressed={profile.bodyExposure === opt.value}
+              aria-label={`${opt.label}, ${opt.value}% BSA`}
               style={{
                 background: profile.bodyExposure === opt.value ? "rgba(245,166,35,0.12)" : "rgba(255,255,255,0.04)",
                 border: `1px solid ${profile.bodyExposure === opt.value ? "var(--sun)" : "var(--border)"}`,
@@ -97,7 +103,7 @@ export function SetupScreen({ onComplete }: { onComplete: (p: UserProfile) => vo
             </div>
             <input type="range" min={5} max={90} value={profile.age ?? 30}
               onChange={(e) => setProfile((p) => ({ ...p, age: +e.target.value }))}
-              className="w-full" />
+              className="w-full" aria-label="Age in years" />
           </div>
           <div>
             <div className="flex justify-between mb-2">
@@ -106,7 +112,7 @@ export function SetupScreen({ onComplete }: { onComplete: (p: UserProfile) => vo
             </div>
             <input type="range" min={30} max={150} value={profile.weight ?? 70}
               onChange={(e) => setProfile((p) => ({ ...p, weight: +e.target.value }))}
-              className="w-full" />
+              className="w-full" aria-label="Weight in kg" />
           </div>
         </div>
       ),
@@ -142,18 +148,20 @@ export function SetupScreen({ onComplete }: { onComplete: (p: UserProfile) => vo
 
         <div className="flex gap-3 mt-4 sm:mt-6">
           {step > 0 && (
-            <button onClick={() => setStep((s) => s - 1)} className="flex-1 py-3 rounded-xl transition-all"
+            <button type="button" onClick={() => setStep((s) => s - 1)} className="flex-1 py-3 rounded-xl transition-all"
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", color: "var(--text-muted)" }}>
               Back
             </button>
           )}
           <button
+            type="button"
             onClick={() => {
               if (step < steps.length - 1) setStep((s) => s + 1);
               else onComplete(profile as UserProfile);
             }}
             disabled={!canNext}
             className="flex-1 py-3 rounded-xl font-medium transition-all"
+            aria-disabled={!canNext}
             style={{
               background: canNext ? "linear-gradient(135deg, var(--sun), var(--sun-deep))" : "rgba(255,255,255,0.06)",
               color: canNext ? "#000" : "var(--text-muted)",

@@ -14,6 +14,7 @@ A lightweight vitamin D sun tracker, inspired by D-Minder iOS/Android — built 
 - 📊 **UV hourly forecast** — visual chart for the day
 - 🌅 **Solar times** — sunrise, solar noon, sunset
 - 💾 **Persistent** — data saved to localStorage
+- 🔐 **Optional sync** — sign in with Supabase to sync across devices (name and location stay on device only)
 
 ## Tech Stack
 
@@ -31,6 +32,15 @@ npm run dev
 ```
 
 Open http://localhost:3000
+
+## Sync across devices (optional)
+
+1. Create a project at [Supabase](https://supabase.com).
+2. In the SQL Editor, run the migration: `supabase/migrations/001_sync.sql`
+3. Copy `.env.example` to `.env.local` and set:
+   - `NEXT_PUBLIC_SUPABASE_URL` — from Supabase → Settings → API
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — from the same page
+4. Sign in via **Profile & Settings** in the app. Only non-sensitive data is synced (e.g. skin type, sessions without location). Name and location are never sent to the server.
 
 ## Deploy to Vercel
 
