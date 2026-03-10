@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
 :root {
   --sun: #F5A623;
@@ -33,6 +33,10 @@ html, body {
   font-family: 'DM Sans', sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+}
+
+* {
+  font-family: inherit;
 }
 
 /* Prevent horizontal overflow on small screens */
@@ -132,5 +136,5 @@ input[type="range"]::-webkit-slider-thumb {
   box-shadow: 0 0 8px rgba(245,166,35,0.5);
 }
 
-/* Display font */
-.font-display { font-family: 'Playfair Display', serif; }
+/* Same font everywhere – .font-display kept for semantics only */
+.font-display { font-family: 'DM Sans', sans-serif; }
