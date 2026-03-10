@@ -1,7 +1,7 @@
 import type { UserProfile, SunSession } from "@/types";
 
-const PROFILE_KEY = "dminder_profile";
-const SESSIONS_KEY = "dminder_sessions";
+const PROFILE_KEY = "remindd_profile";
+const SESSIONS_KEY = "remindd_sessions";
 
 export function saveProfile(profile: UserProfile): void {
   if (typeof window === "undefined") return;

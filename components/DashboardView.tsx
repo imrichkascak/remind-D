@@ -1,7 +1,6 @@
 import type { SunSession, SolarData } from "@/types";
 import { formatTime, getUVCategory, getDailyProgress, getRecommendedDaily } from "@/lib/vitaminD";
-import { SunOrb } from "./SunOrb";
-import { UVChart } from "./UVChart";
+import { SunOrb, UVChart } from "@/common";
 import { SessionTimer } from "./SessionTimer";
 import { SessionCard } from "./SessionCard";
 
@@ -185,7 +184,9 @@ export function DashboardView({
       </div>
 
       {activeSession && solarData && (
-        <SessionTimer session={activeSession} solarData={solarData} onStop={onStopSession} />
+        <div className="w-full max-w-xl lg:max-w-2xl mx-auto">
+          <SessionTimer session={activeSession} solarData={solarData} onStop={onStopSession} />
+        </div>
       )}
 
       {/* Forecast + today's sessions */}

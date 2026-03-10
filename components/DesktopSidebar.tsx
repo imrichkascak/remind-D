@@ -18,7 +18,7 @@ export function DesktopSidebar({ view, setView, profile, location, currentTime }
   return (
     <aside className="hidden md:flex flex-col w-64 lg:w-72 shrink-0 h-screen sticky top-0 border-r" style={{ background: "rgba(10,22,40,0.6)", borderColor: "var(--border)" }}>
       <div className="px-6 pt-8 pb-6">
-        <h1 className="font-display text-2xl" style={{ color: "var(--sun)" }}>D·Minder</h1>
+        <h1 className="font-display text-2xl" style={{ color: "var(--sun)" }}>Remind·D</h1>
         <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Vitamin D Sun Tracker</p>
       </div>
 

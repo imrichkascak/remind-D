@@ -21,6 +21,10 @@
 
 * { box-sizing: border-box; }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -29,6 +33,11 @@ html, body {
   font-family: 'DM Sans', sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Prevent horizontal overflow on small screens */
+body {
+  overflow-x: hidden;
 }
 
 /* Sun glow orb */

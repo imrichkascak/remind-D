@@ -8,7 +8,7 @@ export const SKIN_TYPES = [
   { type: 3, label: "Type III", desc: "Medium, sometimes burns, always tans", color: "#E59866", med: 350 },
   { type: 4, label: "Type IV", desc: "Olive, rarely burns, always tans", color: "#CA6F1E", med: 450 },
   { type: 5, label: "Type V", desc: "Brown, very rarely burns", color: "#935116", med: 600 },
-  { type: 6, label: "Type VI", desc: "Dark brown/black, never burns", color: "#4A235A", med: 800 },
+  { type: 6, label: "Type VI", desc: "Dark brown/black, never burns", color: "#2C1810", med: 800 },
 ];
 
 export const BODY_EXPOSURE_OPTIONS = [
@@ -17,6 +17,7 @@ export const BODY_EXPOSURE_OPTIONS = [
   { value: 30, label: "T-shirt + shorts", icon: "🩳" },
   { value: 50, label: "Swimsuit", icon: "🩱" },
   { value: 75, label: "Minimal clothing", icon: "☀️" },
+  { value: 100, label: "Full body", icon: "🏊" },
 ];
 
 export function estimateUVFromAltitude(altitudeDeg: number): number {

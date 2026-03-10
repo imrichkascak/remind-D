@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       const geoRes = await fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
         {
-          headers: { "User-Agent": "dminder-web/1.0" },
+          headers: { "User-Agent": "remindd-web/1.0" },
           next: { revalidate: 3600 },
         }
       );

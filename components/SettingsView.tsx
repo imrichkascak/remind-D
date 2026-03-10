@@ -34,7 +34,7 @@ export function SettingsView({ profile, sessions, onResetProfile }: {
     <div className="animate-fade-up">
       <h2 className="font-display text-xl mb-4 md:hidden" style={{ color: "var(--text)" }}>Profile</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 max-w-4xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 max-w-4xl w-full">
         <div className="glass rounded-2xl p-5 lg:p-6">
           <h3 className="text-sm font-medium mb-4" style={{ color: "var(--text-muted)", letterSpacing: "0.05em", textTransform: "uppercase" }}>Your profile</h3>
           <div className="flex flex-col gap-3">

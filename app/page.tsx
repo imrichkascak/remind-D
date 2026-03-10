@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import type { UserProfile } from "@/types";
 import { saveProfile, loadProfile } from "@/lib/storage";
-import { SunOrb } from "@/components/SunOrb";
+import { SunOrb } from "@/common";
 import { SetupScreen } from "@/components/SetupScreen";
 import { TrackerScreen } from "@/components/TrackerScreen";
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { UserProfile } from "@/types";
 import { SKIN_TYPES, BODY_EXPOSURE_OPTIONS } from "@/lib/vitaminD";
-import { SunOrb } from "./SunOrb";
+import { SunOrb } from "@/common";
 
 export function SetupScreen({ onComplete }: { onComplete: (p: UserProfile) => void }) {
   const [step, setStep] = useState(0);
@@ -43,7 +43,7 @@ export function SetupScreen({ onComplete }: { onComplete: (p: UserProfile) => vo
       title: "Your skin type",
       subtitle: "Based on the Fitzpatrick scale",
       content: (
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
           {SKIN_TYPES.map((st) => (
             <button
               key={st.type}
@@ -116,14 +116,14 @@ export function SetupScreen({ onComplete }: { onComplete: (p: UserProfile) => vo
   const canNext = step === 0 ? (profile.name?.trim().length ?? 0) > 0 : true;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-10" style={{ background: "linear-gradient(160deg, #0a1628 0%, #112240 50%, #0a1628 100%)" }}>
-      <div className="mb-8 text-center animate-fade-up">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-8 sm:py-10" style={{ background: "linear-gradient(160deg, #0a1628 0%, #112240 50%, #0a1628 100%)" }}>
+      <div className="mb-6 sm:mb-8 text-center animate-fade-up">
         <SunOrb altitude={45} isActive={false} />
-        <h1 className="font-display text-3xl mt-4" style={{ color: "var(--sun)" }}>D·Minder</h1>
-        <p style={{ color: "var(--text-muted)" }}>Vitamin D Sun Tracker</p>
+        <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl mt-4" style={{ color: "var(--sun)" }}>Remind·D</h1>
+        <p className="text-sm sm:text-base" style={{ color: "var(--text-muted)" }}>Vitamin D Sun Tracker</p>
       </div>
 
-      <div className="w-full max-w-sm md:max-w-lg animate-fade-up-2">
+      <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl animate-fade-up-2">
         <div className="flex justify-center gap-2 mb-6">
           {steps.map((_, i) => (
             <div key={i} className="rounded-full transition-all" style={{
@@ -134,13 +134,13 @@ export function SetupScreen({ onComplete }: { onComplete: (p: UserProfile) => vo
           ))}
         </div>
 
-        <div className="glass rounded-2xl p-6 md:p-8">
-          <h2 className="font-display text-xl md:text-2xl mb-1" style={{ color: "var(--text)" }}>{steps[step].title}</h2>
-          <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>{steps[step].subtitle}</p>
+        <div className="glass rounded-2xl p-5 sm:p-6 md:p-8 lg:p-10">
+          <h2 className="font-display text-xl sm:text-2xl md:text-2xl lg:text-3xl mb-1" style={{ color: "var(--text)" }}>{steps[step].title}</h2>
+          <p className="text-sm sm:text-base mb-4 sm:mb-6" style={{ color: "var(--text-muted)" }}>{steps[step].subtitle}</p>
           {steps[step].content}
         </div>
 
-        <div className="flex gap-3 mt-4">
+        <div className="flex gap-3 mt-4 sm:mt-6">
           {step > 0 && (
             <button onClick={() => setStep((s) => s - 1)} className="flex-1 py-3 rounded-xl transition-all"
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid var(--border)", color: "var(--text-muted)" }}>

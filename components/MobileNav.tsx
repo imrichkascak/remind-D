@@ -8,9 +8,9 @@ const NAV_ITEMS: { key: View; icon: string; label: string }[] = [
 
 export function MobileNav({ view, setView }: { view: View; setView: (v: View) => void }) {
   return (
-    <nav className="fixed md:hidden bottom-0 left-0 right-0 px-5 pb-4 pt-2"
+    <nav className="fixed md:hidden bottom-0 left-0 right-0 px-4 sm:px-5 pb-4 pt-2 flex justify-center"
       style={{ background: "linear-gradient(to top, #0a1628 80%, transparent)" }}>
-      <div className="glass rounded-2xl flex">
+      <div className="glass rounded-2xl flex w-full max-w-md">
         {NAV_ITEMS.map((item) => (
           <button
             key={item.key}

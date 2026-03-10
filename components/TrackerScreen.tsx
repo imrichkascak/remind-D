@@ -115,14 +115,14 @@ export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfil
     : VIEW_TITLES[view];
 
   return (
-    <div className="min-h-screen flex" style={{ background: "linear-gradient(160deg, #0a1628 0%, #112240 60%, #0a1628 100%)" }}>
+    <div className="min-h-screen flex w-full" style={{ background: "linear-gradient(160deg, #0a1628 0%, #112240 60%, #0a1628 100%)" }}>
       <DesktopSidebar view={view} setView={setView} profile={profile} location={location} currentTime={currentTime} />
 
-      <div className="flex-1 min-h-screen flex flex-col min-w-0">
+      <div className="flex-1 min-h-screen flex flex-col min-w-0 w-full">
         {/* Mobile header */}
-        <header className="flex md:hidden items-center justify-between px-5 pt-6 pb-2">
+        <header className="flex md:hidden items-center justify-between w-full px-5 pt-6 pb-2 sm:px-6">
           <div>
-            <h1 className="font-display text-xl" style={{ color: "var(--sun)" }}>D·Minder</h1>
+            <h1 className="font-display text-xl" style={{ color: "var(--sun)" }}>Remind·D</h1>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>
               {currentTime.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" })}
             </p>
@@ -134,7 +134,7 @@ export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfil
         </header>
 
         {/* Desktop header */}
-        <header className="hidden md:flex items-center justify-between px-8 lg:px-12 pt-8 pb-4">
+        <header className="hidden md:flex items-center justify-between w-full max-w-content mx-auto px-8 lg:px-12 pt-8 pb-4">
           <div>
             <h2 className="font-display text-2xl lg:text-3xl" style={{ color: "var(--text)" }}>{desktopTitle}</h2>
             <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
@@ -144,7 +144,8 @@ export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfil
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-5 md:px-8 lg:px-12 pb-24 md:pb-8 pt-2">
+        <main className="flex-1 overflow-y-auto w-full px-5 sm:px-6 md:px-8 lg:px-12 pb-24 md:pb-8 pt-2">
+          <div className="w-full max-w-content mx-auto">
           {view === "dashboard" && (
             <DashboardView
               solarData={solarData}
@@ -163,6 +164,7 @@ export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfil
           )}
           {view === "history" && <HistoryView sessions={sessions} />}
           {view === "settings" && <SettingsView profile={profile} sessions={sessions} onResetProfile={onResetProfile} />}
+          </div>
         </main>
 
         <MobileNav view={view} setView={setView} />

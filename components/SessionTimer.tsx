@@ -32,7 +32,7 @@ export function SessionTimer({
   const isDanger = pct >= 100;
 
   return (
-    <div className="glass-warm rounded-2xl p-5 animate-fade-up">
+    <div className="glass-warm rounded-2xl p-5 sm:p-6 lg:p-6 animate-fade-up">
       <div className="flex items-center justify-between mb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
