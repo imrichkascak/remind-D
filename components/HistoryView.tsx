@@ -1,7 +1,7 @@
 import type { SunSession } from "@/types";
 import { SessionCard } from "./SessionCard";
 
-export function HistoryView({ sessions }: { sessions: SunSession[] }) {
+export function HistoryView({ sessions, onDeleteSession }: { sessions: SunSession[]; onDeleteSession: (id: string) => void }) {
   return (
     <div className="animate-fade-up">
       <h2 className="font-display text-xl mb-4 md:hidden" style={{ color: "var(--text)" }}>Session History</h2>
@@ -12,7 +12,9 @@ export function HistoryView({ sessions }: { sessions: SunSession[] }) {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
-          {sessions.map((s) => <SessionCard key={s.id} session={s} />)}
+          {sessions.map((s) => (
+            <SessionCard key={s.id} session={s} onDelete={() => onDeleteSession(s.id)} />
+          ))}
         </div>
       )}
     </div>

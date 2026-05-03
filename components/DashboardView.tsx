@@ -9,24 +9,23 @@ function StartSessionButton({ solarData, onClick, className }: {
   onClick: () => void;
   className?: string;
 }) {
-  const enabled = solarData.uvIndex >= 0.5;
+  const lowUv = solarData.uvIndex < 0.5;
   return (
     <button
       type="button"
       onClick={onClick}
-      disabled={!enabled}
       className={`w-full py-4 rounded-2xl font-medium text-lg transition-all ${className ?? ""}`}
-      aria-label={enabled ? "Start sun session" : "No UV right now"}
+      aria-label={lowUv ? "Start session despite low modeled UV — for logging anytime" : "Start sun session"}
       style={{
-        background: enabled ? "linear-gradient(135deg, #F5A623, #E07B00)" : "rgba(255,255,255,0.06)",
-        color: enabled ? "#000" : "var(--text-muted)",
+        background: lowUv ? "linear-gradient(135deg, #c98a1c, #a86a00)" : "linear-gradient(135deg, #F5A623, #E07B00)",
+        color: "#000",
         border: "none",
-        cursor: enabled ? "pointer" : "not-allowed",
-        boxShadow: enabled ? "0 8px 32px rgba(245,166,35,0.3)" : "none",
+        cursor: "pointer",
+        boxShadow: lowUv ? "0 8px 24px rgba(245,166,35,0.22)" : "0 8px 32px rgba(245,166,35,0.3)",
         transition: "all 0.2s",
       }}
     >
-      {enabled ? "☀️  Start Sun Session" : "🌑  No UV right now"}
+      {lowUv ? "☀️  Start Session (any time)" : "☀️  Start Sun Session"}
     </button>
   );
 }
@@ -118,6 +117,7 @@ export function DashboardView({
   onOpenLocationSettings,
   onStartSession,
   onStopSession,
+  onDeleteSession,
 }: {
   solarData: SolarData | null;
   loading: boolean;
@@ -133,6 +133,7 @@ export function DashboardView({
   onOpenLocationSettings: () => void;
   onStartSession: () => void;
   onStopSession: (s: SunSession) => void;
+  onDeleteSession: (id: string) => void;
 }) {
   const progress = getDailyProgress(todayTotal);
   const uvCat = getUVCategory(solarData?.uvIndex ?? 0);
@@ -238,16 +239,13 @@ export function DashboardView({
           <div className="animate-fade-up-4">
             <p className="text-sm font-medium mb-2" style={{ color: "var(--text-muted)" }}>Today&apos;s sessions</p>
             <div className="flex flex-col gap-2">
-              {todaySessions.slice(0, 3).map((s) => <SessionCard key={s.id} session={s} />)}
+              {todaySessions.slice(0, 3).map((s) => (
+                <SessionCard key={s.id} session={s} onDelete={() => onDeleteSession(s.id)} />
+              ))}
             </div>
           </div>
         )}
       </div>
-
-      {/* Mobile-only start session button */}
-      {!activeSession && solarData && location && (
-        <StartSessionButton solarData={solarData} onClick={onStartSession} className="lg:hidden" />
-      )}
     </div>
   );
 }

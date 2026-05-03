@@ -262,6 +262,18 @@ export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfil
     setActiveSession(null);
   }, [user, profile]);
 
+  const handleDeleteSession = useCallback(
+    (id: string) => {
+      setSessions((prev) => {
+        const updated = prev.filter((s) => s.id !== id);
+        saveSessions(updated);
+        if (user) void pushSync(profile, updated);
+        return updated;
+      });
+    },
+    [user, profile]
+  );
+
   const today = new Date().toDateString();
   const todaySessions = sessions.filter((s) => new Date(s.startTime).toDateString() === today);
   const todayTotal = todaySessions.reduce((sum, s) => sum + s.vitaminD, 0);
@@ -300,7 +312,7 @@ export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfil
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto w-full px-5 sm:px-6 md:px-8 lg:px-12 pb-24 md:pb-8 pt-2">
+        <main className="flex-1 overflow-y-auto w-full px-5 sm:px-6 md:px-8 lg:px-12 pb-[8.75rem] md:pb-8 pt-2">
           <div className="w-full max-w-content mx-auto">
           {view === "dashboard" && (
             <DashboardView
@@ -318,9 +330,10 @@ export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfil
               onOpenLocationSettings={() => setView("settings")}
               onStartSession={handleStartSession}
               onStopSession={handleStopSession}
+              onDeleteSession={handleDeleteSession}
             />
           )}
-          {view === "history" && <HistoryView sessions={sessions} />}
+          {view === "history" && <HistoryView sessions={sessions} onDeleteSession={handleDeleteSession} />}
           {view === "settings" && (
             <SettingsView
               profile={profile}
@@ -336,7 +349,18 @@ export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfil
           </div>
         </main>
 
-        <MobileNav view={view} setView={setView} />
+        <MobileNav
+          view={view}
+          setView={setView}
+          startSession={
+            view === "dashboard" && !activeSession && solarData && location
+              ? {
+                  onPress: handleStartSession,
+                  lowUv: solarData.uvIndex < 0.5,
+                }
+              : undefined
+          }
+        />
       </div>
     </div>
   );
