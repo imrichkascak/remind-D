@@ -1,11 +1,14 @@
-import type { UserProfile, SunSession } from "@/types";
+import type { LocationPreferences, UserProfile, SunSession } from "@/types";
 import { SKIN_TYPES } from "@/lib/vitaminD";
 import { AuthSection } from "./AuthSection";
+import { LocationSettingsCard } from "./LocationSettingsCard";
 
-export function SettingsView({ profile, sessions, onResetProfile }: {
+export function SettingsView({ profile, sessions, onResetProfile, locationPreferences, onLocationPreferencesChange }: {
   profile: UserProfile;
   sessions: SunSession[];
   onResetProfile: () => void;
+  locationPreferences: LocationPreferences;
+  onLocationPreferencesChange: (p: LocationPreferences) => void;
 }) {
   const skinTypeData = SKIN_TYPES[profile.skinType - 1];
 
@@ -39,6 +42,7 @@ export function SettingsView({ profile, sessions, onResetProfile }: {
         <div className="md:col-span-2">
           <AuthSection />
         </div>
+        <LocationSettingsCard locationPreferences={locationPreferences} onLocationPreferencesChange={onLocationPreferencesChange} />
         <div className="glass rounded-2xl p-5 lg:p-6">
           <h3 className="text-sm font-medium mb-4" style={{ color: "var(--text-muted)", letterSpacing: "0.05em", textTransform: "uppercase" }}>Your profile</h3>
           <div className="flex flex-col gap-3">

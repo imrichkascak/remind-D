@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import type { UserProfile, SunSession } from "@/types";
+import type { UserProfile, SunSession, AppLocation } from "@/types";
 import { getSolarData } from "@/lib/vitaminD";
-import { saveSessions, loadSessions } from "@/lib/storage";
+import { loadLocationPreferences, saveLocationPreferences, saveSessions, loadSessions } from "@/lib/storage";
+import { fetchApproxCoordsFromClientNetworks } from "@/lib/clientGeoIp";
 import { pushSync } from "@/lib/sync";
 import { useAuth } from "@/contexts/AuthContext";
 import { DesktopSidebar } from "./DesktopSidebar";
@@ -28,7 +29,9 @@ const VIEW_TITLES: Record<View, string> = {
 
 export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfile; onResetProfile: () => void }) {
   const { user } = useAuth();
-  const [location, setLocation] = useState<{ lat: number; lng: number; city: string } | null>(null);
+  const profileRef = useRef(profile);
+  profileRef.current = profile;
+  const [location, setLocation] = useState<AppLocation | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [solarData, setSolarData] = useState<ReturnType<typeof getSolarData> | null>(null);
   const [hourlyForecast, setHourlyForecast] = useState<number[]>([]);
@@ -37,6 +40,9 @@ export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfil
   const [view, setView] = useState<View>("dashboard");
   const [loading, setLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [locPrefs, setLocPrefs] = useState(loadLocationPreferences);
+  const locPrefsRef = useRef(locPrefs);
+  locPrefsRef.current = locPrefs;
   const clockRef = useRef<ReturnType<typeof setInterval>>();
 
   useEffect(() => {
@@ -53,39 +59,184 @@ export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfil
     return () => clearInterval(clockRef.current);
   }, [location, profile]);
 
-  const requestLocation = useCallback(() => {
+  const applyUvForCoords = useCallback(
+    async (
+      lat: number,
+      lng: number,
+      options?: { approximate?: boolean; cityHint?: string; source?: AppLocation["source"] }
+    ) => {
+    const p = profileRef.current;
+    try {
+      const res = await fetch(`/api/uv?lat=${lat}&lng=${lng}`);
+      const data = (await res.json()) as {
+        city?: string;
+        hourlyForecast?: number[];
+        currentUV?: number;
+      };
+      const loc: AppLocation = {
+        lat,
+        lng,
+        city: data.city ?? options?.cityHint ?? "Your Location",
+        approximate: options?.approximate,
+        source: options?.source,
+      };
+      setLocation(loc);
+      setHourlyForecast(data.hourlyForecast ?? []);
+      const sd = getSolarData(lat, lng, p, new Date());
+      if (data.currentUV != null) sd.uvIndex = data.currentUV;
+      setSolarData(sd);
+      setLocationError(null);
+    } catch {
+      setLocation({
+        lat,
+        lng,
+        city: options?.cityHint ?? "Your Location",
+        approximate: options?.approximate,
+        source: options?.source,
+      });
+      setSolarData(getSolarData(lat, lng, p, new Date()));
+      setLocationError(null);
+    }
+  }, []);
+
+  /** Automatic: network/IP first (works on Safari iOS), then optional GPS refinement. */
+  const requestLocation = useCallback(async () => {
+    if (locPrefsRef.current.mode !== "auto") return;
     setLoading(true);
     setLocationError(null);
+
+    let gotNetwork = false;
+    try {
+      const ipRes = await fetch("/api/locate");
+      if (locPrefsRef.current.mode !== "auto") {
+        setLoading(false);
+        return;
+      }
+      if (ipRes.ok) {
+        const ipData = (await ipRes.json()) as { lat?: number; lng?: number; city?: string };
+        if (typeof ipData.lat === "number" && typeof ipData.lng === "number") {
+          await applyUvForCoords(ipData.lat, ipData.lng, {
+            approximate: true,
+            cityHint: ipData.city,
+            source: "ip",
+          });
+          gotNetwork = true;
+        }
+      }
+    } catch {
+      /* try client geo below */
+    }
+
+    if (locPrefsRef.current.mode !== "auto") {
+      setLoading(false);
+      return;
+    }
+
+    if (!gotNetwork) {
+      try {
+        const c = await fetchApproxCoordsFromClientNetworks();
+        if (locPrefsRef.current.mode !== "auto") {
+          setLoading(false);
+          return;
+        }
+        if (c) {
+          await applyUvForCoords(c.lat, c.lng, {
+            approximate: true,
+            cityHint: c.city,
+            source: "ip",
+          });
+          gotNetwork = true;
+        }
+      } catch {
+        /* GPS or error-only path */
+      }
+    }
+
+    if (locPrefsRef.current.mode !== "auto") {
+      setLoading(false);
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      if (!gotNetwork) {
+        setLocationError(
+          "Could not detect location. Try Settings → Manual, or another network."
+        );
+      }
+      setLoading(false);
+      return;
+    }
+
+    if (gotNetwork) setLoading(false);
+
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const { latitude: lat, longitude: lng } = pos.coords;
-        try {
-          const res = await fetch(`/api/uv?lat=${lat}&lng=${lng}`);
-          const data = await res.json();
-          const loc = { lat, lng, city: data.city ?? "Your Location" };
-          setLocation(loc);
-          setHourlyForecast(data.hourlyForecast ?? []);
-
-          const sd = getSolarData(lat, lng, profile, new Date());
-          if (data.currentUV != null) sd.uvIndex = data.currentUV;
-          setSolarData(sd);
-        } catch {
-          setLocation({ lat, lng, city: "Your Location" });
-          setSolarData(getSolarData(lat, lng, profile, new Date()));
+        if (locPrefsRef.current.mode !== "auto") {
+          setLoading(false);
+          return;
         }
+        const { latitude: lat, longitude: lng } = pos.coords;
+        await applyUvForCoords(lat, lng, { approximate: false, source: "gps" });
         setLoading(false);
       },
       () => {
-        setLocationError("Location access denied. Please allow location permissions.");
+        if (locPrefsRef.current.mode !== "auto") {
+          setLoading(false);
+          return;
+        }
+        if (!gotNetwork) {
+          setLocationError(
+            "Location unavailable: GPS was blocked or timed out and network lookup failed (corporate firewall or strict privacy?). Use Settings · Location → Manual city or time zone."
+          );
+        }
         setLoading(false);
-      }
+      },
+      { enableHighAccuracy: false, maximumAge: 300_000, timeout: 14_000 }
     );
-  }, [profile]);
+  }, [applyUvForCoords]);
 
   useEffect(() => {
-    requestLocation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
-  }, []);
+    if (locPrefs.mode === "manual") {
+      if (!locPrefs.manual) {
+        setLocation(null);
+        setSolarData(null);
+        setHourlyForecast([]);
+        setLocationError(
+          "Choose your city or time zone under Settings · Location."
+        );
+        setLoading(false);
+        return;
+      }
+
+      const m = locPrefs.manual;
+      let cancelled = false;
+      void (async () => {
+        setLoading(true);
+        setLocationError(null);
+        await applyUvForCoords(m.lat, m.lng, {
+          approximate: true,
+          cityHint: m.city,
+          source: "manual",
+        });
+        if (cancelled) return;
+        if (
+          locPrefsRef.current.mode !== "manual" ||
+          locPrefsRef.current.manual?.lat !== m.lat ||
+          locPrefsRef.current.manual?.lng !== m.lng
+        ) {
+          return;
+        }
+        setLoading(false);
+      })();
+
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    void requestLocation();
+    return undefined;
+  }, [locPrefs.mode, locPrefs.manual, applyUvForCoords, requestLocation]);
 
   const handleStartSession = useCallback(() => {
     if (!location || !solarData) return;
@@ -162,13 +313,26 @@ export function TrackerScreen({ profile, onResetProfile }: { profile: UserProfil
               todaySessions={todaySessions}
               todayTotal={todayTotal}
               currentTime={currentTime}
+              useAutoLocation={locPrefs.mode === "auto"}
               onRequestLocation={requestLocation}
+              onOpenLocationSettings={() => setView("settings")}
               onStartSession={handleStartSession}
               onStopSession={handleStopSession}
             />
           )}
           {view === "history" && <HistoryView sessions={sessions} />}
-          {view === "settings" && <SettingsView profile={profile} sessions={sessions} onResetProfile={onResetProfile} />}
+          {view === "settings" && (
+            <SettingsView
+              profile={profile}
+              sessions={sessions}
+              onResetProfile={onResetProfile}
+              locationPreferences={locPrefs}
+              onLocationPreferencesChange={(p) => {
+                saveLocationPreferences(p);
+                setLocPrefs(p);
+              }}
+            />
+          )}
           </div>
         </main>
 

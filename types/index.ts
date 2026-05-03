@@ -6,6 +6,32 @@ export interface UserProfile {
   name: string;
 }
 
+/** How coordinates were obtained (for UI hints). */
+export type LocationSource = "gps" | "ip" | "manual";
+
+/** Session / UI location; approximate when not from device GPS. */
+export interface AppLocation {
+  lat: number;
+  lng: number;
+  city: string;
+  approximate?: boolean;
+  source?: LocationSource;
+}
+
+/** User-chosen place for manual mode (persists in localStorage). */
+export interface ManualLocationPick {
+  lat: number;
+  lng: number;
+  city: string;
+  /** IANA zone if set via time zone picker */
+  timezone?: string;
+}
+
+export interface LocationPreferences {
+  mode: "auto" | "manual";
+  manual: ManualLocationPick | null;
+}
+
 export interface SunSession {
   id: string;
   date: string; // ISO
@@ -13,7 +39,7 @@ export interface SunSession {
   endTime?: number;
   vitaminD: number; // IU
   uvIndex: number;
-  location: { lat: number; lng: number; city: string };
+  location: AppLocation;
   skinType: number;
   bodyExposure: number;
 }

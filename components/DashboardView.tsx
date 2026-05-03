@@ -1,4 +1,4 @@
-import type { SunSession, SolarData } from "@/types";
+import type { AppLocation, SunSession, SolarData } from "@/types";
 import { formatTime, getUVCategory, getDailyProgress, getRecommendedDaily } from "@/lib/vitaminD";
 import { SunOrb, UVChart } from "@/common";
 import { SessionTimer } from "./SessionTimer";
@@ -113,20 +113,24 @@ export function DashboardView({
   todaySessions,
   todayTotal,
   currentTime,
+  useAutoLocation,
   onRequestLocation,
+  onOpenLocationSettings,
   onStartSession,
   onStopSession,
 }: {
   solarData: SolarData | null;
   loading: boolean;
   locationError: string | null;
-  location: { lat: number; lng: number; city: string } | null;
+  location: AppLocation | null;
   activeSession: SunSession | null;
   hourlyForecast: number[];
   todaySessions: SunSession[];
   todayTotal: number;
   currentTime: Date;
-  onRequestLocation: () => void;
+  useAutoLocation: boolean;
+  onRequestLocation: () => void | Promise<void>;
+  onOpenLocationSettings: () => void;
   onStartSession: () => void;
   onStopSession: (s: SunSession) => void;
 }) {
@@ -148,7 +152,27 @@ export function DashboardView({
           {locationError && (
             <div>
               <p className="text-sm mb-2" style={{ color: "#f87171" }}>{locationError}</p>
-              <button type="button" onClick={onRequestLocation} className="text-sm underline" style={{ color: "var(--sun)" }} aria-label="Try again to get location">Try again</button>
+              {useAutoLocation ? (
+                <button
+                  type="button"
+                  onClick={() => void onRequestLocation()}
+                  className="text-sm underline"
+                  style={{ color: "var(--sun)" }}
+                  aria-label="Try again to get location"
+                >
+                  Try again
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onOpenLocationSettings}
+                  className="text-sm underline"
+                  style={{ color: "var(--sun)" }}
+                  aria-label="Open Settings to choose location"
+                >
+                  Open Settings
+                </button>
+              )}
             </div>
           )}
 
@@ -171,6 +195,16 @@ export function DashboardView({
               </div>
 
               <SunStatusBanner solarData={solarData} />
+              {location?.approximate && location?.source === "manual" && (
+                <p className="text-xs mt-2 text-center px-1" style={{ color: "var(--text-muted)" }}>
+                  Manual place (city or time zone). Good enough for regional UV; not your exact GPS spot.
+                </p>
+              )}
+              {location?.approximate && location?.source === "ip" && (
+                <p className="text-xs mt-2 text-center px-1" style={{ color: "var(--text-muted)" }}>
+                  Approximate area from your network (IP). UV is still useful for your region.
+                </p>
+              )}
             </>
           )}
         </div>

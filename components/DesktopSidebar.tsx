@@ -1,4 +1,4 @@
-import type { UserProfile } from "@/types";
+import type { AppLocation, UserProfile } from "@/types";
 
 type View = "dashboard" | "history" | "settings";
 
@@ -12,7 +12,7 @@ export function DesktopSidebar({ view, setView, profile, location, currentTime }
   view: View;
   setView: (v: View) => void;
   profile: UserProfile;
-  location: { lat: number; lng: number; city: string } | null;
+  location: AppLocation | null;
   currentTime: Date;
 }) {
   return (
@@ -52,7 +52,20 @@ export function DesktopSidebar({ view, setView, profile, location, currentTime }
           </div>
           <div className="min-w-0">
             <p className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>{profile.name}</p>
-            <p className="text-xs truncate" style={{ color: "var(--text-muted)" }}>{location?.city ?? "—"}</p>
+            <p
+              className="text-xs truncate"
+              style={{ color: "var(--text-muted)" }}
+              title={
+                location?.source === "manual"
+                  ? "Manual location"
+                  : location?.approximate
+                    ? "Approximate (network)"
+                    : undefined
+              }
+            >
+              {location?.city ?? "—"}
+              {location?.source === "manual" ? " · ✎" : location?.approximate ? " · ~" : ""}
+            </p>
           </div>
         </div>
         <p className="text-xs mt-3" style={{ color: "var(--text-muted)" }}>
